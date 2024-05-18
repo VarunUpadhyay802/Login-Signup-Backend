@@ -7,7 +7,7 @@ exports.signup = async (req, res) => {
   try {
     const existingUser = await User.findOne({ email: email });
     if (existingUser) {
-      return res.status(400).send({ message: "User already exists!" });
+      return res.status(400).send({ success: false, message: "User already exists!" });
     }
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -16,36 +16,31 @@ exports.signup = async (req, res) => {
       password: hashedPassword,
       username: username,
     });
-    return res.status(201).send({ user });
+    return res.status(201).send({ success: true, user });
   } catch (error) {
-    return res.status(500).send({ message: "Error signing up!", error: error });
+    return res.status(500).send({ success: false, message: "Error signing up!", error: error });
   }
 };
 
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const existingUser = await User.findOne({ email: email });
+    const existingUser = await User.findOne({ email });
 
     if (!existingUser) {
-      return res.status(400).send({ message: "User not found" });
+      return res.status(400).send({ success: false, message: "User not found" });
     }
 
-    const passwordMatched = await bcrypt.compare(
-      password,
-      existingUser.password
-    );
+    const passwordMatched = await bcrypt.compare(password, existingUser.password);
 
     if (!passwordMatched) {
-      return res.status(400).send({ message: "wrong password" });
+      return res.status(400).send({ success: false, message: "Wrong password" });
     }
 
     const jwtToken = jwt.sign(
-      {
-        _id: existingUser._id,
-        email: existingUser.email,
-      },
-      JWT_KEY
+      { _id: existingUser._id, email: existingUser.email },
+      JWT_KEY,
+      { expiresIn: '24h' } // Set expiration time as needed
     );
 
     res.cookie("token", jwtToken, {
@@ -55,9 +50,9 @@ exports.login = async (req, res) => {
       sameSite: "lax",
     });
 
-    return res.status(200).send({ existingUser, jwtToken });
+    return res.status(200).send({ success: true, message: "Login successful", existingUser, jwtToken });
   } catch (error) {
-    return res.status(500).send({ message: "Error log in!", error: error });
+    return res.status(500).send({ success: false, message: "Error log in!", error });
   }
 };
 
