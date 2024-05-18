@@ -6,7 +6,8 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
-  "https://login-signup-frontend-khaki.vercel.app"
+  "https://login-signup-frontend-khaki.vercel.app",
+  "https://relaxed-otter-0e2692.netlify.app"
 ];
 
 app.use(
