@@ -6,7 +6,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
-  "https://cograd-erp.vercel.app",
+  "https://login-signup-frontend-khaki.vercel.app/"
 ];
 
 app.use(
